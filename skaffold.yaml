@@ -1,0 +1,52 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+# deploy: List out of of the config files we want to load into our cluster
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+build:
+  local:
+    push: false
+  # googleCloudBuild:
+  #   projectId: teamcit-dev
+  # artifacts - All of the things that are going to be built
+  artifacts:
+  #  the personal project is used for local development, uncomment line below and comment out line after that
+    - image: boslott/teamcit-auth
+  #  us.gcr.io is the Google Cloud VM running the dev environment, uncomment line below and comment out line above
+    # - image: us.gcr.io/teamcit-dev/auth
+      # context - The directory where all the files are located
+      context: auth
+      docker:
+        dockerfile: Dockerfile
+        buildArgs:
+          NPM_TOKEN: "{{ .NPM_TOKEN }}"
+      # sync - How to handle an files that change inside the context directory
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    - image: boslott/teamcit-client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.tsx'
+            dest: .
+          - src: '**/*.ts'
+            dest: .
+          - src: '**/*.js'
+            dest: .
+    - image: boslott/tickets
+      context: tickets
+      docker:
+        dockerfile: Dockerfile
+        buildArgs:
+          NPM_TOKEN: "{{ .NPM_TOKEN }}"
+      # sync - How to handle an files that change inside the context directory
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .

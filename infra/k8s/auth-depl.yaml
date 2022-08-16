@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+spec:
+  replicas: 1
+  # selector: Step 1 of 2, tells the deployment how to FIND all the pods it is going to create
+  selector:
+    matchLabels:
+      app: auth
+  # template: How to create each individual pod this deployment will create
+  template:
+    metadata:
+      labels:
+        app: auth
+    # spec: Tells the pod how to behave
+    spec:
+      containers:
+        - name: auth  # For logging purposes only
+        # As with the skaffold file, the personal image is for local dev, the gcr.io is for Google Cloud development
+          image: boslott/teamcit-auth
+          # image: us.gcr.io/teamcit-dev/auth
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://auth-mongo-srv:27017/auth'
+            - name: JWT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_KEY
+---
+# Because there is usually a 1:1 ratio of deployment to service, put the related service in the same file as the deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+#spec: Tell the service how to behave
+spec:
+  # selector: Tell this service how to find the set of pods it is supposed to govern access to
+  selector:
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 8000
+      targetPort: 8000

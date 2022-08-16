@@ -8,4 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: export NPM_TOKEN=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 && cd auth && npm install && npm run test:ci
+      - run: cd auth && npm install && npm run test:ci
+        env:
+          NPM_TOKEN: ${{ secrets.COMMON_PACKAGE_SECRET }}

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { app } from './app';
 
 const start = async () => {
-	console.log('Auth Service starting up ... !');
+	console.log('Auth Service Starting Up ... !');
 	if (!process.env.JWT_KEY) {
 		throw new Error('JWT_KEY environment variable must be defined');
 	}

@@ -4,6 +4,8 @@ import { app } from './app';
 
 const start = async () => {
 
+	console.log('Tickets Service is starting up ... !');
+
 	if (!process.env.JWT_KEY) {
 		throw new Error('JWT_KEY environment variable must be defined');
 	}
